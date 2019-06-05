@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gyt.fittrainer.mapper.EventMapper" >
+  <resultMap id="BaseResultMap" type="com.gyt.fittrainer.dto.Event" >
+    <id column="event_id" property="eventId" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="start" property="start" jdbcType="TIMESTAMP" />
+    <result column="end" property="end" jdbcType="TIMESTAMP" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    event_id, user_id, start_time, end_time, title
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from event
+    where event_id = #{eventId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from event
+    where event_id = #{eventId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.gyt.fittrainer.dto.Event" >
+    insert into event (event_id, user_id, start,
+      end, title)
+    values (#{eventId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gyt.fittrainer.dto.Event" >
+    insert into event
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="eventId != null" >
+        event_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="start != null" >
+        start,
+      </if>
+      <if test="end != null" >
+        end,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="eventId != null" >
+        #{eventId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="start!= null" >
+        #{start,jdbcType=TIMESTAMP},
+      </if>
+      <if test="end != null" >
+        #{end,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gyt.fittrainer.dto.Event" >
+    update event
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="start != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="end != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where event_id = #{eventId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gyt.fittrainer.dto.Event" >
+    update event
+    set user_id = #{userId,jdbcType=BIGINT},
+      start = #{start,jdbcType=TIMESTAMP},
+      end = #{end,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR}
+    where event_id = #{eventId,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+      select *
+      from event e
+      where e.user_id = #{userId}
+  </select>
+
+  <select id="checkIfOccupied" resultType="int" parameterType="com.gyt.fittrainer.dto.Event">
+    SELECT
+    count( * )
+    FROM
+    EVENT e
+    WHERE
+    e.user_id = #{userId}
+    AND (
+    #{start} BETWEEN e.start and e.end or #{end} BETWEEN e.start and e.end or (e.start &gt; #{start} and e.end&lt;#{end}))
+  </select>
+</mapper>

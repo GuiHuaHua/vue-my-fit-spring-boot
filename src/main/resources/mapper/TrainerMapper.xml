@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gyt.fittrainer.mapper.TrainerMapper">
+    <resultMap id="BaseResultMap" type="com.gyt.fittrainer.dto.Trainer">
+        <id column="trainer_id" property="trainerId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="picture" property="picture" jdbcType="VARCHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    trainer_id, user_id, description, picture
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from trainer
+        where trainer_id = #{trainerId,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from trainer
+    where trainer_id = #{trainerId,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.gyt.fittrainer.dto.Trainer">
+    insert into trainer (trainer_id, user_id, description, 
+      picture)
+    values (#{trainerId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{description,jdbcType=VARCHAR}, 
+      #{picture,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.gyt.fittrainer.dto.Trainer">
+        insert into trainer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="trainerId != null">
+                trainer_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="picture != null">
+                picture,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="trainerId != null">
+                #{trainerId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="picture != null">
+                #{picture,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.gyt.fittrainer.dto.Trainer">
+        update trainer
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="picture != null">
+                picture = #{picture,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where trainer_id = #{trainerId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.gyt.fittrainer.dto.Trainer">
+    update trainer
+    set user_id = #{userId,jdbcType=BIGINT},
+      description = #{description,jdbcType=VARCHAR},
+      picture = #{picture,jdbcType=VARCHAR}
+    where trainer_id = #{trainerId,jdbcType=BIGINT}
+  </update>
+
+    <select id="getTrainerList" parameterType="com.gyt.fittrainer.dto.Trainer" resultMap="BaseResultMap">
+    SELECT
+        t.*,
+        u.user_name
+    FROM
+        relation r,
+        trainer t,
+        USER u
+    WHERE
+        r.trainer_id = t.trainer_id
+        AND r.user_id = #{userId}
+        AND u.user_id = t.user_id
+  </select>
+    
+    <select id="checkIfExists" parameterType="java.lang.Long" resultType="int">
+        select count(*)
+        from trainer t
+        where t.user_id = #{userId}
+    </select>
+</mapper>
